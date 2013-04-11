@@ -1,13 +1,6 @@
 package com.bunich.productparser;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.nio.MappedByteBuffer;
-import java.nio.channels.FileChannel;
-import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.List;
+import java.io.*;
 
 public class ProductParser {
 
@@ -32,15 +25,20 @@ public class ProductParser {
         return fileList;
     }
     public static String createStringFromFile(File file) throws IOException {
-        FileInputStream stream = new FileInputStream(file);
+        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(new FileInputStream(file), "UTF-8"));
+        StringBuffer output = new StringBuffer();
         try {
-            FileChannel fc = stream.getChannel();
-            MappedByteBuffer bb = fc.map(FileChannel.MapMode.READ_ONLY, 0, fc.size());
-            return Charset.defaultCharset().decode(bb).toString();
+            String line = null;
+            while ((line = bufferedReader.readLine()) != null){
+                output.append(line);
+                output.append(System.getProperty("line.separator"));
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            bufferedReader.close();
         }
-        finally {
-            stream.close();
-        }
+        return output.toString();
     }
 /*
    public static String getProductString(File productFile){
