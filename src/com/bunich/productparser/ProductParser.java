@@ -12,9 +12,17 @@ public class ProductParser {
         }
     }
 
+    /**
+     * Создает xml файл содержащий информацию по продуктам содержащимся в текстовых файлах из массива files[]
+     * @param files массив тектовых файлов, содержащих информацию по продуктам
+     * @param path путь к создаваемому xml файлу.
+     * @return xml файл, с информацией по продуктам.
+     * @throws IOException
+     */
     public static File createXMLFile(File files[], String path) throws IOException {
         File xml = new File(path);
         writeStringToFile("<?xml version=\"1.0\" encoding=\"UTF-8\"?><products>", xml);
+        /*Делаем запись для каждого продукта из списка files[]*/
         for (File f : files){
             writeProductsToXMLFromFile(f, xml);
         }
@@ -30,15 +38,13 @@ public class ProductParser {
 
     private static void writeStringToFile(String string, File file) throws IOException {
         BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "Cp1251"));
-        try {
-            bufferedWriter.write(string);
-        } catch (IOException e) {
-            throw e;
-        }
+        bufferedWriter.write(string);
+        bufferedWriter.close();
     }
+
     public static String createXMLString(String string){
         String[] product = string.split(" ");
-        StringBuffer xmlString = new StringBuffer("<product name=\"");
+        StringBuilder xmlString = new StringBuilder("<product name=\"");
         xmlString.append(product[0]);
         xmlString.append("\"><date>");
         xmlString.append(product[3]);
@@ -50,6 +56,11 @@ public class ProductParser {
         return xmlString.toString();
     }
 
+    /**
+     * Метод подготавливает список файлов для дальнейшей обработки.
+     * @param paths массив путей к текстовым файлам, в которых хранятся списки продуктов.
+     * @return Массив объектов класса File, содержащих списки продуктов.
+     */
     public static File[] createProductFileList(String paths[]) {
         File[] fileList = new File[paths.length];
         for (int i = 0; i<paths.length; i++){
@@ -60,9 +71,9 @@ public class ProductParser {
 
     public static String createStringFromFile(File file) throws IOException {
         BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(new FileInputStream(file), "Cp1251"));
-        StringBuffer output = new StringBuffer();
+        StringBuilder output = new StringBuilder();
         try {
-            String line = null;
+            String line;
             while ((line = bufferedReader.readLine()) != null){
                 output.append(line);
                 output.append(System.getProperty("line.separator"));
