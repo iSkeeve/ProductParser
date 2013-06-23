@@ -6,10 +6,23 @@ public class ProductParser {
 
     public static void main(String args[]){
         try {
-            createXMLFile(createProductFileList(args), "products.xml");
+            createXMLFile(createProductFileList(args), "productss.xml");
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    /**
+     * Метод подготавливает список файлов для дальнейшей обработки.
+     * @param paths массив путей к текстовым файлам, в которых хранятся списки продуктов.
+     * @return Массив объектов класса File, содержащих списки продуктов.
+     */
+    public static File[] createProductFileList(String paths[]) {
+        File[] fileList = new File[paths.length];
+        for (int i = 0; i<paths.length; i++){
+            fileList[i] = new File(paths[i]);
+        }
+        return fileList;
     }
 
     /**
@@ -21,6 +34,7 @@ public class ProductParser {
      */
     public static File createXMLFile(File files[], String path) throws IOException {
         File xml = new File(path);
+        prepareFileForWriting(xml);
         writeStringToFile("<?xml version=\"1.0\" encoding=\"UTF-8\"?><products>", xml);
         /*Делаем запись для каждого продукта из списка files[]*/
         for (File f : files){
@@ -30,6 +44,14 @@ public class ProductParser {
         return xml;
     }
 
+    private static void prepareFileForWriting(File file) throws IOException {
+        /*Если файл не существует создаем новый*/
+        if (!file.createNewFile()){
+        /*Если существует, стираем содержимое файла*/
+            writeStringToFile("", file, false);
+        }
+    }
+
     private static void writeProductsToXMLFromFile(File f, File xml) throws IOException {
         for (String s : createStringFromFile(f).split("\n")){
             writeStringToFile(createXMLString(s), xml);
@@ -37,9 +59,13 @@ public class ProductParser {
     }
 
     private static void writeStringToFile(String string, File file) throws IOException {
-        BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "Cp1251"));
-        bufferedWriter.write(string);
-        bufferedWriter.close();
+        writeStringToFile(string, file, true);
+    }
+
+    private static void writeStringToFile(String string, File file, boolean appendable) throws IOException {
+        PrintWriter printWriter = new PrintWriter(new FileWriter(file, appendable));
+        printWriter.print(string);
+        printWriter.close();
     }
 
     public static String createXMLString(String string){
@@ -54,19 +80,6 @@ public class ProductParser {
         xmlString.append(product[1]);
         xmlString.append("</price><product>");
         return xmlString.toString();
-    }
-
-    /**
-     * Метод подготавливает список файлов для дальнейшей обработки.
-     * @param paths массив путей к текстовым файлам, в которых хранятся списки продуктов.
-     * @return Массив объектов класса File, содержащих списки продуктов.
-     */
-    public static File[] createProductFileList(String paths[]) {
-        File[] fileList = new File[paths.length];
-        for (int i = 0; i<paths.length; i++){
-            fileList[i] = new File(paths[i]);
-        }
-        return fileList;
     }
 
     public static String createStringFromFile(File file) throws IOException {
